@@ -1,6 +1,6 @@
 // To-do
 // 5 asserts
-// 6 исправь все ошибки, сделай рабочую сортировку пузырьком для статического массива и будем переходить дальше
+// 6 bubblesort
 
 
 
@@ -14,7 +14,7 @@
 
 //---------------------- Functions Initialization -----------------------//
 
-void StringSorter (char text, int *index, int t_height, int t_length);
+void StringSorter (char **text, int *index, int t_height, int t_length);
 int CharComparator (char x, char y);
 
 //----------------------------- Constants -------------------------------//
@@ -36,8 +36,6 @@ enum BubbleSortStates
 
 int main ()
 {
-
-
     const int t_height = 6;
     const int t_length = 7;
 
@@ -49,12 +47,12 @@ int main ()
                                      "his",
                                      "and"};
 
-    StringSorter (text[0][0], index, t_height, t_length);
+    StringSorter (text, index, t_height, t_length);
 }
 
 //--------------------------- Other functions --------------------------//
 
-void StringSorter (char text, int *index, int t_height, int t_length)
+void StringSorter (char **text, int *index, int t_height, int t_length)
 {
     int BubbleSortCriteria = REPEAT;
     char x = '\0';
@@ -68,8 +66,8 @@ void StringSorter (char text, int *index, int t_height, int t_length)
         {
             for (int j = 0; j < t_length - 1; j++)
             {
-                x = text;
-                y = text;
+                x = text[i][j];
+                y = text[i+1][j];
 
                 int CCV = CharComparator (x, y);
 
