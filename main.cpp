@@ -14,7 +14,7 @@
 
 //---------------------- Functions Initialization -----------------------//
 
-void StringSorter (char **text, int *index, int t_height, int t_length);
+void StringSorter (char text, int *index, int t_height, int t_length);
 int CharComparator (char x, char y);
 
 //----------------------------- Constants -------------------------------//
@@ -47,12 +47,12 @@ int main ()
                                      "his",
                                      "and"};
 
-    StringSorter (text, index, t_height, t_length);
+    StringSorter (*text[t_height], index, t_height, t_length);
 }
 
 //--------------------------- Other functions --------------------------//
 
-void StringSorter (char **text, int *index, int t_height, int t_length)
+void StringSorter (char text, int *index, int t_height, int t_length)
 {
     int BubbleSortCriteria = REPEAT;
     char x = '\0';
