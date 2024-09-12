@@ -1,5 +1,4 @@
 // To-do
-// 1 gitignore
 // 3 в charcomporator ты не правильно адресуешься к переменной text, также при вызове charcomporator передаешь неверное значение.
 // 4 в вызове stringsorter также неверно передается text. Сама функция принимает одномерный массив, а ты передаешь указатель на двумерный массив.
 // 5 расставь assertы
@@ -17,8 +16,8 @@
 
 //---------------------- Functions Initialization -----------------------//
 
-void StringSorter (char *text, int *index, int t_height, int t_length);
-char CharComparator (int i, int j, char *text);
+void StringSorter (char text, int *index, int t_height, int t_length);
+int CharComparator (char x, char y);
 
 //----------------------------- Constants -------------------------------//
 
@@ -50,14 +49,16 @@ int main ()
                                      "his",
                                      "and"};
 
-    StringSorter (&text[0][0], index, t_height, t_length);
+    StringSorter (text[0][0], index, t_height, t_length);
 }
 
 //--------------------------- Other functions --------------------------//
 
-void StringSorter (char *text, int *index, int t_height, int t_length)
+void StringSorter (char text, int *index, int t_height, int t_length)
 {
     int BubbleSortCriteria = REPEAT;
+    char x = '\0';
+    char y = '\0';
 
     while (BubbleSortCriteria == REPEAT)
     {
@@ -67,15 +68,18 @@ void StringSorter (char *text, int *index, int t_height, int t_length)
         {
             for (int j = 0; j < t_length - 1; j++)
             {
-                int CCV = CharComparator (i, j, &text[0][0]);
+                x = text;
+                y = text;
+
+                int CCV = CharComparator (x, y);
 
                 if (CCV == LESSER)
                 {
                     int temp_sloth = index[i];
                     index[i] = index[i+1];
                     index[i+1] = temp_sloth;
-                    break;
                     BubbleSortCriteria = REPEAT;
+                    break;
                 }
                 else
                     continue;
@@ -86,11 +90,11 @@ void StringSorter (char *text, int *index, int t_height, int t_length)
 
 //----------------------------------------------------------------------//
 
-int CharComparator (int i, int j, char *text)
+int CharComparator (char x, char y)
 {
-    if (text[i][j] > text[i+1][j])
+    if (x > y)
         return BIGGER;
-    else if (text[i][j] < text[i+1][j])
+    else if (x < y)
         return LESSER;
     else
         return EQUAL;
