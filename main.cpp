@@ -54,6 +54,8 @@ int main ()
 
 void StringSorter (char text, int *index, int t_height, int t_length)
 {
+    assert (&text != NULL);
+
     int BubbleSortCriteria = REPEAT;
     char x = '\0';
     char y = '\0';
@@ -90,6 +92,9 @@ void StringSorter (char text, int *index, int t_height, int t_length)
 
 int CharComparator (char x, char y)
 {
+    assert (isfinite (x));
+    assert (isfinite (y));
+
     if (x > y)
         return BIGGER;
     else if (x < y)
