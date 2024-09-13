@@ -1,12 +1,8 @@
-// To-do
-// 5 asserts
-// 6 bubblesort
-
-
 
 //------------------------ Libraries and Files --------------------------//
 
 #include <stdio.h>
+#include <string.h>
 #include <math.h>
 #include <assert.h>
 #include <ctype.h>
@@ -14,8 +10,9 @@
 
 //---------------------- Functions Initialization -----------------------//
 
-void StringSorter (char text, int *index, int t_height, int t_length);
+void StringSorter (int t_height, int t_length, char text[][7], int index[]);
 int CharComparator (char x, char y);
+void Output (char text[][7], int index[]);
 
 //----------------------------- Constants -------------------------------//
 
@@ -40,19 +37,21 @@ int main ()
     const int t_length = 7;
 
     int index[] = {0, 1, 2, 3, 4, 5};
-    char text[t_height][t_length] = {"my",
-                                     "when",
-                                     "he",
+    char text[t_height][t_length] = {"meat",
+                                     "s",
+                                     "xerox",
                                      "and",
-                                     "his",
-                                     "and"};
+                                     "when",
+                                     "ant"};
 
-    StringSorter (*text[t_height], index, t_height, t_length);
+    StringSorter (t_height, t_length, text, index);
+
+    Output(text, index);
 }
 
 //--------------------------- Other functions --------------------------//
 
-void StringSorter (char text, int *index, int t_height, int t_length)
+void StringSorter (int t_height, int t_length, char text[][7], int index[])
 {
     assert (&text != NULL);
 
@@ -60,16 +59,17 @@ void StringSorter (char text, int *index, int t_height, int t_length)
     char x = '\0';
     char y = '\0';
 
-    while (BubbleSortCriteria == REPEAT)
+    while (BubbleSortCriteria != RIGHT)
     {
+
         BubbleSortCriteria = RIGHT;
 
-        for (int i = 0; i < t_height - 1; i++)
+        for (int i = 0; i <= t_height + 1; i++)
         {
-            for (int j = 0; j < t_length - 1; j++)
+            for (int j = 0; j <= t_length + 1; j++)
             {
-                x = text[i][j];
-                y = text[i+1][j];
+                x = text[index[i]][j];
+                y = text[index[i+1]][j];
 
                 int CCV = CharComparator (x, y);
 
@@ -81,8 +81,13 @@ void StringSorter (char text, int *index, int t_height, int t_length)
                     BubbleSortCriteria = REPEAT;
                     break;
                 }
-                else
+                else if (CCV == EQUAL)
                     continue;
+                else
+                {
+                    break;
+                    BubbleSortCriteria = RIGHT;
+                }
             }
         }
     }
@@ -103,4 +108,12 @@ int CharComparator (char x, char y)
         return EQUAL;
 
     return 0;
+}
+
+//----------------------------------------------------------------------//
+
+void Output (char text[][7], int index[])
+{
+    for (unsigned int i = 0; i <= sizeof(index) + 1; i++)
+        printf ("%d %s\n", i + 1, text[index[sizeof(index) + 1 - i]]);
 }
