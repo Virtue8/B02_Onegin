@@ -1,11 +1,14 @@
-//to-do
-// fread stuff
-// funcs pointers
 
-//q:
-//1) charcomparator value
-//2) switch in SS
-//3) more simple bubblesort
+//ZZN advice:
+//
+//char * all_chars (calloc(sizeoffile<-fstat (sizeof (char) !))) ask SDS
+//fread to read file to all_chars, return how_many_bytes_are_read?=x
+// num of strs  ('\n')
+//        ^           char ** str_adr   (also calloc(x, sizeofunit))     pointers of strings beginnings
+// '/n' to '/0' func
+// also 0th str address and +1 (cause de '\0')
+
+// then bubblesort str_adr
 
 
 //------------------------ Libraries and Files --------------------------//
@@ -17,11 +20,42 @@
 #include <ctype.h>
 #include <TXLib.h>
 
-//---------------------- Functions Initialization -----------------------//
+#define FILENAME text.txt
 
-void StringSorter (int t_height, int t_length, char text[][7], int index[]);
+//------------------------ Main Functions Init --------------------------//
+
+FILE * FileOpener (const char * file_stream);   // opens the stream
+
+//     ||
+//    \||/
+//     \/
+
+size_t FileSize (FILE * file);          // counts the amount of strings and meaning
+                                        // chars in every string of file
+//     ||
+//    \||/
+//     \/
+
+void FileToArray ();                    // 1) puts the reformed content
+                                        //    of the file to "text" array
+//     ||                               // 2) creates "index" array with
+//    \||/                              //    every string unique index
+//     \/                               //    (to sort in future)
+
+void BubbleSort (char ** text);
+
+//     ||                               // sorts indexes according to a-z (qSort in future)
+//    \||/
+//     \/
+
+void Output ();                         // writes the result in "output.txt"
+                                        // (currently it outputs the data in terminal)
+
+
+//---------------------- Secondary Functions Init -----------------------//
+
 int CharComparator (char x, char y);
-void Output (char text[][7], int index[]);
+void Output (string text[t_height], int index[t_height]);
 
 //----------------------------- Constants -------------------------------//
 
@@ -42,16 +76,12 @@ enum BubbleSortStates
 
 int main ()
 {
-    const int t_height = 6;
-    const int t_length = 7;
+    string text[t_height] = {};
+    int index[t_height] = {};
+    for (int i = 0; i < t_height; i++)
+        index[i] += i;                                 //makes index look like {0, 1, ..., 63}
 
-    int index[] = {0, 1, 2, 3, 4, 5};
-    char text[t_height][t_length] = {"meat",
-                                     "s",
-                                     "xerox",
-                                     "and",
-                                     "when",
-                                     "ant"};
+    fread (text, sizeof (char), t_height * t_length, file);
 
     StringSorter (t_height, t_length, text, index);
 
@@ -60,7 +90,9 @@ int main ()
 
 //--------------------------- Other functions --------------------------//
 
-void StringSorter (int t_height, int t_length, char text[][7], int index[])
+FILE * FileOpener ()
+
+void BubbleSort (int t_height, int t_length, string text[t_height], int index[t_height])
 {
     int BubbleSortCriteria = REPEAT;
     char x = '\0';
@@ -113,7 +145,7 @@ int CharComparator (char x, char y)
 
 //----------------------------------------------------------------------//
 
-void Output (char text[][7], int index[])
+void Output (string text[t_height], int index[t_height])
 {
     for (unsigned int i = 0; i <= sizeof(index) + 1; i++)
         printf ("%d %s\n", i + 1, text[index[sizeof(index) + 1 - i]]);
