@@ -1,3 +1,12 @@
+//to-do
+// fread stuff
+// funcs pointers
+
+//q:
+//1) charcomparator value
+//2) switch in SS
+//3) more simple bubblesort
+
 
 //------------------------ Libraries and Files --------------------------//
 
@@ -53,8 +62,6 @@ int main ()
 
 void StringSorter (int t_height, int t_length, char text[][7], int index[])
 {
-    assert (&text != NULL);
-
     int BubbleSortCriteria = REPEAT;
     char x = '\0';
     char y = '\0';
@@ -84,10 +91,7 @@ void StringSorter (int t_height, int t_length, char text[][7], int index[])
                 else if (CCV == EQUAL)
                     continue;
                 else
-                {
                     break;
-                    BubbleSortCriteria = RIGHT;
-                }
             }
         }
     }
@@ -97,9 +101,6 @@ void StringSorter (int t_height, int t_length, char text[][7], int index[])
 
 int CharComparator (char x, char y)
 {
-    assert (isfinite (x));
-    assert (isfinite (y));
-
     if (x > y)
         return BIGGER;
     else if (x < y)
