@@ -2,80 +2,93 @@
 //------------------------ Libraries and Files --------------------------//
 
 #include <stdio.h>
-#include <string.h>
+//#include <string.h>
 #include <math.h>
 #include <assert.h>
 #include <ctype.h>
 #include <TXLib.h>
-
-#define FILENAME text.txt
+#include <stdlib.h>
+#include <sys/stat.h>
 
 //------------------------ Main Functions Init --------------------------//
 
-FILE * FileOpener (const char * file_name);
-size_t FileReader (FILE * file_onegin);
+void FileReader (struct Onegin * oneg);
+void LineSeparator (struct Onegin * oneg);
 void Sorter (char ** text);
 void Output ();
-int CharComparator (char x, char y);
+int CharComparator (char *x, char *y);
 
 //----------------------- Constants and Structs -------------------------//
 
-const char * file_name = "text.txt"
-
-/*
 struct Onegin
 {
-    FILE * file_onegin = NULL;
-    size_t file_size = 0;
-    char ** all_chars = 0;
+    FILE * file_onegin = NULL;                         // source file
+    const char *FILE_NAME = NULL;                      // name of the source file
 
-    size_t lines_amount = 0;
+    size_t file_size = 0;                              // size of the source file
+    char * buffer = 0;                                 // buffer with data
 
-    struct Line line_data = NULL;
+    size_t lines_amount = 0;                           // amount of lines in the source file
+
+    struct Line * line_data[] = NULL;                  // current line data
 };
 
 struct Line
 {
-    size_t line_len = 0;
-    char * line_place = 0;
+    size_t str_len = 0;                                // length of the line
+    char * str = 0;                                    // line pointer
 };
-*/
 
 //-------------------------------- main ---------------------------------//
 
 int main ()
 {
-    FileOpener (file_name)
+    Onegin oneg = {};
+    Line line = {};
+    const char * oneg.file_onegin = "text.txt";
+
+    FileOpener (oneg.FILE_NAME);
+    LineSeparator (&oneg);
 }
 
 //--------------------------- Other functions --------------------------//
 
-FILE * FileOpener (const char * file_name)
+void FileReader (struct Onegin * oneg)
 {
-    FILE * file_onegin = fopen (file_name, "r");
-    if (file_onegin == NULL)
+    oneg.file_onegin = fopen (oneg.FILE_NAME, "r");
+    assert(oneg.file_onegin != NULL);                  // source file opening
+
+    struct stat st = {};                               // getting the file size
+    fstat(fileno(oneg.file_onegin), &st);              // through fstat()
+    oneg.file_size = st.st_size;
+
+    char * oneg.buffer = (char *) calloc (oneg.file_size + 1, sizeof(char));    // reading the content
+    fread (oneg.buffer, sizeof(char), oneg.file_size, oneg.file_onegin);        // to buffer
+}
+
+//----------------------------------------------------------------------//
+
+void LineSeparator (struct Onegin * oneg)
+{
+    assert (oneg.buffer != NULL);
+
+    oneg.lines_amount = 1;
+    oneg.line_data.str[0] = oneg.buffer;
+
+    char ** oneg.line_data = (char **) calloc (oneg.);
+
+    for (int i = 0; oneg.buffer[i] != EOF; i++)
     {
-        printf ("Incorrect Input!\n");
-        exit ();
+        if ((int) oneg.buffer[i] == '\n' || oneg.buffer[i] == EOF)
+        {
+            oneg.buffer[i-1] = '\0';
+            oneg.lines_amount++;
+            oneg.line_data.str[oneg.lines_amount] = oneg.buffer + i + 1;
+            oneg.line_data.str_len[i] = (int) (oneg.line_data.str[oneg.lines_amount]/
+            - oneg.line_data.str[oneg.lines_amount - 1]); //line length
+        }
     }
-    else
-        return file_onegin;
 }
-
-//---------------------------------------------------------------------//
-
-size_t FileReader (FILE * file_onegin)
-{
-    fseek (file_onegin, 0, SEEK_SET);
-    file_size = fscanf (file_onegin);
-
-    char * all_chars = (char *) calloc (file_onegin, file_size);
-
-    // missing: getting all info for structs
-    // (not introduced yet, but the same parameters must be got here)
-}
-
-// missing: Sorter, Output
 
 //----------------------------------------------------------------------//
 
