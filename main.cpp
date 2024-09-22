@@ -26,7 +26,7 @@ struct Onegin
     const char *FILE_NAME = NULL;                      // name of the source file
 
     size_t file_size = 0;                              // size of the source file
-    char * buffer = 0;                                 // buffer with data
+    char * buffer = NULL;                              // buffer with data
 
     size_t lines_amount = 0;                           // amount of lines in the source file
 
@@ -36,7 +36,7 @@ struct Onegin
 struct Line
 {
     size_t str_len = 0;                                // length of the line
-    char * str = 0;                                    // line pointer
+    char * str = NULL;                                 // line pointer
 };
 
 //-------------------------------- main ---------------------------------//
@@ -44,7 +44,6 @@ struct Line
 int main ()
 {
     Onegin oneg = {};
-    Line line = {};
     const char * oneg.file_onegin = "text.txt";
 
     FileReader (oneg.FILE_NAME);
@@ -75,11 +74,13 @@ void LineSeparator (struct Onegin * oneg)
     oneg.lines_amount = 1;
     oneg.line_data.str[0] = oneg.buffer;
 
-    char ** oneg.line_data = (char **) calloc (oneg.);
+    char ** oneg.line_data = (char **) calloc (oneg.file_size + 1, sizeof(char));
 
-    for (int i = 0; oneg.buffer[i] != EOF; i++)
+    oneg.buffer[oneg.file_size + 1] = '\0';
+
+    for (int i = 0; i != oneg.file_size + 1; i++)
     {
-        if ((int) oneg.buffer[i] == '\n' || oneg.buffer[i] == EOF)
+        if (oneg.buffer[i] == '\n')
         {
             oneg.buffer[i-1] = '\0';
             oneg.lines_amount++;
