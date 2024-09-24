@@ -2,7 +2,7 @@
 //------------------------ Libraries and Files --------------------------//
 
 #include <stdio.h>
-//#include <string.h>
+#include <string.h>
 #include <math.h>
 #include <assert.h>
 #include <ctype.h>
@@ -14,9 +14,8 @@
 
 void FileReader (struct Onegin * oneg);
 void LineSeparator (struct Onegin * oneg);
-void Sorter (char ** text);
-void Output ();
-int CharComparator (char *x, char *y);
+void Sorter (struct Onegin * oneg);
+void FileWriter (struct Onegin * oneg);
 
 //----------------------- Constants and Structs -------------------------//
 
@@ -27,16 +26,9 @@ struct Onegin
 
     size_t file_size = 0;                              // size of the source file
     char * buffer = NULL;                              // buffer with data
+    char * line_ptrs = NULL;                           // buffer line pointers
 
     size_t lines_amount = 0;                           // amount of lines in the source file
-
-    struct Line * line = NULL;                         // current line data
-};
-
-struct Line
-{
-    size_t str_len = 0;                                // length of the line
-    char * str = NULL;                                 // line pointer
 };
 
 //-------------------------------- main ---------------------------------//
@@ -46,9 +38,9 @@ int main ()
     assert (oneg != NULL);
 
     Onegin oneg = {};
-    const char * oneg.file_onegin = "text.txt";
+    oneg.FILE_NAME = "text.txt";
 
-    FileReader (oneg.FILE_NAME);
+    FileReader (&oneg);
     LineSeparator (&oneg);
 }
 
@@ -69,8 +61,8 @@ void FileReader (struct Onegin * oneg)
 
     char * oneg.buffer = (char *) calloc (oneg.file_size + 1, sizeof(char));             // reading the content
     assert (oneg.buffer != NULL);                                                        // to buffer
-    ReadStatus = fread (oneg.buffer, sizeof(char), oneg.file_size, oneg.file_onegin);
-    assert (ReadStatus != NULL);
+    size_t ReadStatus = fread (oneg.buffer, sizeof(char), oneg.file_size, oneg.file_onegin);
+    assert (ReadStatus != ferror);
     fclose (oneg.FILE_NAME);
 }
 
@@ -81,17 +73,13 @@ void LineSeparator (struct Onegin * oneg)
     assert (oneg != NULL);
 
     oneg.lines_amount = 1;
-
-    char ** line_data_buffer = (char **) calloc (oneg.file_size + 1, sizeof(char));
-    assert (line_data_buffer);
-
-    oneg.buffer[oneg.file_size + 1] = '\0';
+    *(oneg.buffer + oneg.file_size + 1) = '\0';
 
     for (int i = 0; i != oneg.file_size + 1; i++)
     {
-        if (oneg.buffer[i] == '\n')
+        if (*(oneg.buffer + i) == '\n')
         {
-            oneg.buffer[i-1] = '\0';
+            *(oneg.buffer + i - 1) = '\0';
             oneg.lines_amount++;
         }
     }
@@ -99,18 +87,38 @@ void LineSeparator (struct Onegin * oneg)
 
 //----------------------------------------------------------------------//
 
-void Sorter (char ** text)
+void Sorter (struct Onegin * oneg)
 {
     assert (oneg != NULL);
 
+    char * oneg.line_ptrs = (char *) calloc (oneg.lines_amount, sizeof(char));
+    assert (oneg.line_ptrs != NULL);
+    *oneg.line_ptrs = *oneg.buffer;
+    int current_line = 0;
 
+    for (int i = 0; i < oneg.file_size; i++)
+    {
+        if (*(oneg.buffer + i) == '\n')
+        {
+            current_line++;
+            *(oneg.line_ptrs + current_line) = *(oneg.buffer + i + 1);
+        }
+    }
 }
 
 //----------------------------------------------------------------------//
 
-void Output (string text[t_height], int index[t_height])
+void FileWriter (struct Onegin * oneg)
 {
     assert (oneg != NULL);
 
+    output_file = fopen ("output.txt", "r");
 
+    for (int i = 0; i < oneg.lines_amount, i++)
+    {
+        size_t ReadStatus = fwrite (oneg.buffer, sizeof(char), oneg.file_size, output_file);
+        assert (ReadStatus != oneg.file_size);
+    }
+
+    fclose (oneg.FILE_NAME);
 }
