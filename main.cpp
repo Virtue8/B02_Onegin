@@ -30,7 +30,7 @@ struct Onegin
 
     size_t lines_amount = 0;                           // amount of lines in the source file
 
-    struct Line * line_data = NULL;                    // current line data
+    struct Line * line = NULL;                         // current line data
 };
 
 struct Line
@@ -43,6 +43,8 @@ struct Line
 
 int main ()
 {
+    assert (oneg != NULL);
+
     Onegin oneg = {};
     const char * oneg.file_onegin = "text.txt";
 
@@ -54,27 +56,34 @@ int main ()
 
 void FileReader (struct Onegin * oneg)
 {
+    assert (oneg != NULL);                             // checking the right memory allocation
+    assert (oneg.buffer != NULL);
+
     oneg.file_onegin = fopen (oneg.FILE_NAME, "r");
     assert(oneg.file_onegin != NULL);                  // source file opening
 
     struct stat st = {};                               // getting the file size
     fstat(fileno(oneg.file_onegin), &st);              // through fstat()
     oneg.file_size = st.st_size;
+    assert (oneg.file_size != 0);
 
-    char * oneg.buffer = (char *) calloc (oneg.file_size + 1, sizeof(char));    // reading the content
-    fread (oneg.buffer, sizeof(char), oneg.file_size, oneg.file_onegin);        // to buffer
+    char * oneg.buffer = (char *) calloc (oneg.file_size + 1, sizeof(char));             // reading the content
+    assert (oneg.buffer != NULL);                                                        // to buffer
+    ReadStatus = fread (oneg.buffer, sizeof(char), oneg.file_size, oneg.file_onegin);
+    assert (ReadStatus != NULL);
+    fclose (oneg.FILE_NAME);
 }
 
 //----------------------------------------------------------------------//
 
 void LineSeparator (struct Onegin * oneg)
 {
-    assert (oneg.buffer != NULL);
+    assert (oneg != NULL);
 
     oneg.lines_amount = 1;
-    oneg.line_data.str[0] = oneg.buffer;
 
-    char ** oneg.line_data = (char **) calloc (oneg.file_size + 1, sizeof(char));
+    char ** line_data_buffer = (char **) calloc (oneg.file_size + 1, sizeof(char));
+    assert (line_data_buffer);
 
     oneg.buffer[oneg.file_size + 1] = '\0';
 
@@ -92,26 +101,16 @@ void LineSeparator (struct Onegin * oneg)
 
 void Sorter (char ** text)
 {
+    assert (oneg != NULL);
 
-}
 
-//----------------------------------------------------------------------//
-
-int CharComparator (char x, char y)
-{
-    if (x > y)
-        return BIGGER;
-    else if (x < y)
-        return LESSER;
-    else
-        return EQUAL;
-
-    return 0;
 }
 
 //----------------------------------------------------------------------//
 
 void Output (string text[t_height], int index[t_height])
 {
-    .
+    assert (oneg != NULL);
+
+
 }
