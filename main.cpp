@@ -49,6 +49,12 @@ int main ()
 
     FileReader (&oneg);
     LineSeparator (&oneg);
+    Sorter (&oneg);
+    FileWriter (&oneg);
+
+    free (oneg.buffer);
+    free (oneg.line.lines_ptr);
+    free (oneg.line.line_len);
 }
 
 //--------------------------- Other functions --------------------------//
@@ -179,13 +185,17 @@ void FileWriter (struct Onegin * oneg)
 {
     assert (oneg != NULL);
 
-    output_file = fopen ("output.txt", "r");
+    char * buffer_sorted = (char *) calloc (oneg.file_size + 1, sizeof(char));
 
-    for (int i = 0; i < oneg.lines_amount, i++)
+    for (int i = 0; i < oneg.file_size + 1, i++)
     {
-        size_t ReadStatus = fwrite (oneg.buffer, sizeof(char), oneg.file_size, output_file);
-        assert (ReadStatus != oneg.file_size);
+        *(buffer_sorted + i) = ...;
     }
 
+    output_file = fopen ("output.txt", "r");
+    size_t ReadStatus = fwrite (buffer_sorted, sizeof(char), oneg.file_size, output_file);
+    assert (ReadStatus != oneg.file_size);
+
     fclose (oneg.FILE_NAME);
+    free (buffer_sorted);
 }
