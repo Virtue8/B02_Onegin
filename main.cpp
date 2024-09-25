@@ -15,7 +15,7 @@
 void FileReader (struct Onegin * oneg);
 void LineSeparator (struct Onegin * oneg);
 void Sorter (struct Onegin * oneg);
-void BubbleSort (struct Onegin * oneg);
+int BubbleSort (char a, size_t len_a, char b, size_t len_b, struct Onegin * oneg);
 void FileWriter (struct Onegin * oneg);
 
 //----------------------- Constants and Structs -------------------------//
@@ -119,8 +119,8 @@ void Sorter (struct Onegin * oneg)
 
     int truth_status = FALSE;
 
-    char a = '\0';
-    char b = '\0';
+    char * a = NULL;
+    char * b = NULL;
 
     size_t len_a = 0;
     size_t len_b = 0;
@@ -132,28 +132,45 @@ void Sorter (struct Onegin * oneg)
             len_a = *(oneg.line.line_len + i);
             len_b = *(oneg.line.line_len + i + 1);
 
-            a = *(oneg.line.lines_ptr + i);
-            b = *(oneg.line.lines_ptr + i + 1);
+            a = oneg.line.lines_ptr + i;
+            b = oneg.line.lines_ptr + i + 1;
 
-            for (int j = 0; j < max(len_a, len_b); j++);
+            if (BubbleSort (a, len_a, b, len_b, &oneg) = 1)
             {
-                if (BubbleSort (a, len_a, b, len_b) = 1)
-                {
-                    Swapper(a, b);
-                    truth_status = FALSE;
-                }
-                else
-                    truth_status = TRUE;
+                Swapper(&oneg, i);
+                truth_status = FALSE;
             }
+            else
+                truth_status = TRUE;
         }
     }
 }
 
 //----------------------------------------------------------------------//
 
-int BubbleSort (char a, size_t len_a, char b, size_t len_b)
+int BubbleSort (char * a, size_t len_a, char * b, size_t len_b, struct Onegin * oneg)
 {
+    for (int j = 0; j < max(len_a, len_b); j++);
+    {
+        char ch_a = *(a + j);
+        char ch_b = *(b + j);
 
+        if (ch_a > ch_b)
+        {
+            return 1;
+        }
+        if (ch_b > ch_a)
+            return -1;
+    }
+}
+
+//----------------------------------------------------------------------//
+
+void Swapper (struct Onegin * oneg, int i)
+{
+    size_t temp = *(oneg.line.lines_ptr + i);
+    *(oneg.line.lines_ptr + i) = *(oneg.line.lines_ptr + i + 1);
+    *(oneg.line.lines_ptr + i + 1) = temp;
 }
 
 //----------------------------------------------------------------------//
