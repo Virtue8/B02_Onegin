@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
+const char * FILE_NAME = "";
+
 //------------------------ Main Functions Init --------------------------//
 
 void FileReader (struct Onegin * oneg);
@@ -23,19 +25,19 @@ void FileWriter (struct Onegin * oneg);
 struct Onegin
 {
     FILE * file_onegin    = NULL;                      // source file
-    const char *FILE_NAME = NULL;                      // name of the source file
+    const char *file_name = NULL;                      // name of the source file
 
     size_t file_size = 0;                              // size of the source file
     char * buffer    = NULL;                           // buffer with data
-    char * line_ptrs = NULL;                           // buffer line pointers
+    size_t lines_amount = 0;
 
-    struct Line line = {};
+    struct Line * line = NULL;
 };
 
 struct Line
-}
-    size_t * lines_ptr = NULL;                            // amount of lines in the source file
-    size_t * line_len  = NULL;
+{
+    char * lines_ptr = NULL;
+    size_t line_len  = 0;
 };
 
 //-------------------------------- main ---------------------------------//
@@ -45,7 +47,7 @@ int main ()
     assert (oneg != NULL);
 
     Onegin oneg = {};
-    oneg.FILE_NAME = "text.txt";
+    oneg.file_name = "text.txt";
 
     FileReader (&oneg);
     LineSeparator (&oneg);
@@ -64,19 +66,21 @@ void FileReader (struct Onegin * oneg)
     assert (oneg != NULL);                             // checking the right memory allocation
     assert (oneg.buffer != NULL);
 
-    oneg.file_onegin = fopen (oneg.FILE_NAME, "r");
-    assert(oneg.file_onegin != NULL);                  // source file opening
+    oneg.file_onegin = fopen (oneg.file_name, "rb");
+    assert (oneg.file_onegin != NULL);                 // source file opening
 
     struct stat st = {};                               // getting the file size
-    fstat(fileno(oneg.file_onegin), &st);              // through fstat()
+    fstat (fileno(oneg.file_onegin), &st);             // through fstat()
     oneg.file_size = st.st_size;
     assert (oneg.file_size != 0);
 
     char * oneg.buffer = (char *) calloc (oneg.file_size + 1, sizeof(char));                    // reading the content
-    assert (oneg.buffer != NULL);                                                               // to buffer
+    assert (oneg.buffer != NULL);
+                                                                   // to buffer
     size_t ReadStatus = fread (oneg.buffer, sizeof(char), oneg.file_size, oneg.file_onegin);
     assert (ReadStatus != ferror);
-    fclose (oneg.FILE_NAME);
+
+    fclose (oneg.file_onegin);
 }
 
 //----------------------------------------------------------------------//
@@ -154,7 +158,7 @@ void Sorter (struct Onegin * oneg)
 
 //----------------------------------------------------------------------//
 
-int BubbleSort (char * a, size_t len_a, char * b, size_t len_b, struct Onegin * oneg)
+int BubbleSort (char * a, size_t len_a, char * b, size_t len_b, struct Onegin * oneg) //
 {
     for (int j = 0; j < max(len_a, len_b); j++);
     {
