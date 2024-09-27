@@ -18,6 +18,7 @@ void FileReader (struct Onegin * oneg);
 void LineSeparator (struct Onegin * oneg);
 void Sorter (struct Onegin * oneg);
 int BubbleSort (char a, size_t len_a, char b, size_t len_b, struct Onegin * oneg);
+void Swapper (struct Onegin * oneg, int i, int j);
 void FileWriter (struct Onegin * oneg);
 
 //----------------------- Constants and Structs -------------------------//
@@ -27,8 +28,8 @@ struct Onegin
     FILE * file_onegin    = NULL;                      // source file
     const char *file_name = NULL;                      // name of the source file
 
-    size_t file_size = 0;                              // size of the source file
-    char * buffer    = NULL;                           // buffer with data
+    size_t file_size    = 0;                              // size of the source file
+    char * buffer       = NULL;                           // buffer with data
     size_t lines_amount = 0;
 
     struct Line * line = NULL;
@@ -74,9 +75,9 @@ void FileReader (struct Onegin * oneg)
     oneg.file_size = st.st_size;
     assert (oneg.file_size != 0);
 
-    char * oneg.buffer = (char *) calloc (oneg.file_size + 1, sizeof(char));                    // reading the content
-    assert (oneg.buffer != NULL);
-                                                                   // to buffer
+    char * oneg.buffer = (char *) calloc (oneg.file_size + 1, sizeof(char));       // reading the content
+    assert (oneg.buffer != NULL);                                                  // to buffer
+
     size_t ReadStatus = fread (oneg.buffer, sizeof(char), oneg.file_size, oneg.file_onegin);
     assert (ReadStatus != ferror);
 
@@ -127,43 +128,36 @@ void Sorter (struct Onegin * oneg)
 {
     assert (oneg != NULL);
 
-    int truth_status = FALSE;
-
     char * a = NULL;
     char * b = NULL;
 
     size_t len_a = 0;
     size_t len_b = 0;
 
-    while (truth_status != TRUE)
+    for (int i = 0; i < oneg.line_num; i++)
     {
-        for (int i = 0; i < oneg.line_num - 1; i++)
-        {
-            len_a = *(oneg.line.line_len + i);
-            len_b = *(oneg.line.line_len + i + 1);
+        len_a = *(oneg.line.line_len + i);
+        a = oneg.line.lines_ptr + i;
 
-            a = oneg.line.lines_ptr + i;
-            b = oneg.line.lines_ptr + i + 1;
+        for (int j = 1; j < oneg.line_num - i; j++)
+        {
+            len_b = *(oneg.line.line_len + j);
+            b = oneg.line.lines_ptr + j;
 
             if (BubbleSort (a, len_a, b, len_b, &oneg) = 1)
-            {
-                Swapper(&oneg, i);
-                truth_status = FALSE;
-            }
-            else
-                truth_status = TRUE;
+                Swapper(&oneg, i, j);
         }
     }
 }
 
 //----------------------------------------------------------------------//
 
-int BubbleSort (char * a, size_t len_a, char * b, size_t len_b, struct Onegin * oneg) //
+int BubbleSort (char * a, size_t len_a, char * b, size_t len_b, struct Onegin * oneg)
 {
-    for (int j = 0; j < max(len_a, len_b); j++);
+    for (int k = 0; k < max(len_a, len_b); k++);
     {
-        char ch_a = *(a + j);
-        char ch_b = *(b + j);
+        char ch_a = *(a + k);
+        char ch_b = *(b + k);
 
         if (ch_a > ch_b)
         {
@@ -176,11 +170,11 @@ int BubbleSort (char * a, size_t len_a, char * b, size_t len_b, struct Onegin * 
 
 //----------------------------------------------------------------------//
 
-void Swapper (struct Onegin * oneg, int i)
+void Swapper (struct Onegin * oneg, int i, int j)
 {
     size_t temp = *(oneg.line.lines_ptr + i);
-    *(oneg.line.lines_ptr + i) = *(oneg.line.lines_ptr + i + 1);
-    *(oneg.line.lines_ptr + i + 1) = temp;
+    *(oneg.line.lines_ptr + i) = *(oneg.line.lines_ptr + j);
+    *(oneg.line.lines_ptr + j) = temp;
 }
 
 //----------------------------------------------------------------------//
@@ -193,7 +187,7 @@ void FileWriter (struct Onegin * oneg)
 
     for (int i = 0; i < oneg.file_size + 1, i++)
     {
-        *(buffer_sorted + i) = ...;
+        *(buffer.sorted + i) = ;
     }
 
     output_file = fopen ("output.txt", "r");
