@@ -1,0 +1,93 @@
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\Vadim\Documents\GitHub\B02_Onegin\main.exe, файл: C:\Users\Vadim\Documents\GitHub\B02_Onegin\main.cpp, строка: 67, функция: void FileReader(Onegin*),
+
+Сообщение: ВНЕЗАПНО: Логическая ошибка: Неверно, что "oneg->buffer != __null".
+
+#1: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x1B44 (Main). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\vadim\downloads\codeblocks\mingw\include\txlib.h
+Compiled:	Sep 29 2024 17:16:59, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Sep 29 2024 17:17:10
+
+Run file:	C:\Users\Vadim\Documents\GitHub\B02_Onegin\main.exe
+Directory:	C:\Users\Vadim\Documents\GitHub\B02_Onegin
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\Vadim\Documents\GitHub\B02_Onegin\main.exe, файл: C:\Users\Vadim\Documents\GitHub\B02_Onegin\main.cpp, строка: 67, функция: void FileReader(Onegin*),
+
+Сообщение: ВНЕЗАПНО: Логическая ошибка: Неверно, что "oneg->buffer != __null".
+
+#1: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x2A68 (Main). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\vadim\downloads\codeblocks\mingw\include\txlib.h
+Compiled:	Sep 29 2024 17:26:11, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Sep 29 2024 17:26:21
+
+Run file:	C:\Users\Vadim\Documents\GitHub\B02_Onegin\main.exe
+Directory:	C:\Users\Vadim\Documents\GitHub\B02_Onegin
+
+--------------------------------------------------
+
+--------------------------------------------------
+TXLib соболезнует...
+
+Программа: C:\Users\Vadim\Documents\GitHub\B02_Onegin\main.exe, файл: C:\Users\Vadim\Documents\GitHub\B02_Onegin\main.cpp, строка: 65, функция: void FileReader(Onegin*),
+
+Сообщение: ВНЕЗАПНО: Логическая ошибка: Неверно, что "oneg->buffer != __null".
+
+#1: TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400], Instance: 0x005072FC (32-bit), Flags: Cmdre0, Thread: 0x19AC (Main). 
+
+--------------------------------------------------
+Стек вызовов:
+
+
+
+--------------------------------------------------
+Developed with:
+
+The Dumb Artist Library (TX Library)
+TXLib [Ver: 00173a, Rev: 173, Date: 2024-06-23 22:37:05 +0400]
+Copyright (C) Ded (Ilya Dedinsky, http://txlib.ru) <mail@txlib.ru>
+See license on: http://txlib.ru
+
+TXLib file:	c:\users\vadim\downloads\codeblocks\mingw\include\txlib.h
+Compiled:	Sep 29 2024 17:29:23, GNU g++ 4.8.1, std=201103L, MinGW Runtime 3.20, 32-bit, DEBUG
+Started:	Sep 29 2024 17:29:33
+
+Run file:	C:\Users\Vadim\Documents\GitHub\B02_Onegin\main.exe
+Directory:	C:\Users\Vadim\Documents\GitHub\B02_Onegin
+
+--------------------------------------------------
