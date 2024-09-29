@@ -48,9 +48,13 @@ int main ()
     oneg.file_name = "text.txt";
 
     FileReader (&oneg);
+    printf("reader\n");
     LineSeparator (&oneg);
+    printf("separator\n");
     Sorter (&oneg);
+    printf("sorter\n");
     FileOutput (&oneg);
+    printf("writer\n");
 
     free (oneg.buffer);
     free (oneg.line->lines_ptr);
@@ -61,8 +65,7 @@ int main ()
 
 void FileReader (struct Onegin * oneg)
 {
-    assert (oneg != NULL);                             // checking the right memory allocation
-    assert (oneg->buffer != NULL);
+    assert (oneg != NULL);
 
     oneg->file_onegin = fopen (oneg->file_name, "rb");
     assert (oneg->file_onegin != NULL);                 // source file opening
@@ -100,8 +103,13 @@ void LineSeparator (struct Onegin * oneg)
         }
     }
 
-    oneg->line->lines_ptr = (char *) calloc (oneg->lines_amount, sizeof(size_t));
-    oneg->line->line_len = (size_t) calloc (oneg->lines_amount, sizeof(size_t));
+    printf ("%d", oneg->lines_amount);
+
+    oneg->line->lines_ptr = (char *) calloc (oneg->lines_amount + 1, sizeof(size_t));
+    printf ("hui\n");
+    oneg->line->line_len = (size_t) calloc (oneg->lines_amount + 1, sizeof(size_t));
+    assert (oneg->line->lines_ptr != NULL);
+    assert (oneg->line->line_len != 0);
 
     int curr_line_num = 0;                                // line counter (local)
     int prev_i_value = -1;
