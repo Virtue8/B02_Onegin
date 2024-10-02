@@ -106,8 +106,8 @@ void LineSeparator (struct Onegin * oneg)
     printf ("%d", oneg->lines_amount);
 
     oneg->line->lines_ptr = (char *) calloc (oneg->lines_amount + 1, sizeof(size_t));
-    printf ("hui\n");
-    oneg->line->line_len = (size_t) calloc (oneg->lines_amount + 1, sizeof(size_t));
+    printf ("yeee\n");
+    oneg->line->line_len = (int) calloc (oneg->lines_amount + 1, sizeof(int));
     assert (oneg->line->lines_ptr != NULL);
     assert (oneg->line->line_len != 0);
 
