@@ -1,16 +1,4 @@
 
-//ZZN advice:
-//
-//char * all_chars (calloc(sizeoffile<-fstat (sizeof (char) !))) ask SDS
-//fread to read file to all_chars, return how_many_bytes_are_read?=x
-// num of strs  ('\n')
-//        ^           char ** str_adr   (also calloc(x, sizeofunit))     pointers of strings beginnings
-// '/n' to '/0' func
-// also 0th str address and +1 (cause de '\0')
-
-// then bubblesort str_adr
-
-
 //------------------------ Libraries and Files --------------------------//
 
 #include <stdio.h>
@@ -18,135 +6,232 @@
 #include <math.h>
 #include <assert.h>
 #include <ctype.h>
-#include <TXLib.h>
-
-#define FILENAME text.txt
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/param.h>
 
 //------------------------ Main Functions Init --------------------------//
 
-FILE * FileOpener (const char * file_stream);   // opens the stream
+void FileReader (struct Onegin * oneg);
+void LineSeparator (struct Onegin * oneg);
+void Sorter (struct Onegin * oneg);
+int Comparator (char * a, size_t len_a, char * b, size_t len_b);
+void Swapper (struct Onegin * oneg, int i, int j);
+//void FileWriter (struct Onegin * oneg);
+void FileOutput (struct Onegin * oneg);
 
-//     ||
-//    \||/
-//     \/
+//------------------------ Secondary Functions --------------------------//
 
-size_t FileSize (FILE * file);          // counts the amount of strings and meaning
-                                        // chars in every string of file
-//     ||
-//    \||/
-//     \/
+size_t GimmeFileSize (struct Onegin * oneg);
+size_t BufferLinesCounter (struct Onegin * oneg);
 
-void FileToArray ();                    // 1) puts the reformed content
-                                        //    of the file to "text" array
-//     ||                               // 2) creates "index" array with
-//    \||/                              //    every string unique index
-//     \/                               //    (to sort in future)
+//----------------------- Constants and Structs -------------------------//
 
-void BubbleSort (char ** text);
-
-//     ||                               // sorts indexes according to a-z (qSort in future)
-//    \||/
-//     \/
-
-void Output ();                         // writes the result in "output.txt"
-                                        // (currently it outputs the data in terminal)
-
-
-//---------------------- Secondary Functions Init -----------------------//
-
-int CharComparator (char x, char y);
-void Output (string text[t_height], int index[t_height]);
-
-//----------------------------- Constants -------------------------------//
-
-enum CharState
+struct Onegin
 {
-    EQUAL,
-    BIGGER,
-    LESSER
+    FILE * file_onegin    = NULL;                      // source file
+    const char *file_name = NULL;                      // name of the source file
+
+    size_t file_size    = 0;                              // size of the source file
+    char * buffer       = NULL;                           // buffer with data
+    size_t lines_amount = 0;
+
+    struct Line * line = NULL;
 };
 
-enum BubbleSortStates
+struct Line
 {
-    REPEAT,
-    RIGHT
+    char * lines_ptr = NULL;
+    int line_len  = 0;
 };
 
 //-------------------------------- main ---------------------------------//
 
 int main ()
 {
-    string text[t_height] = {};
-    int index[t_height] = {};
-    for (int i = 0; i < t_height; i++)
-        index[i] += i;                                 //makes index look like {0, 1, ..., 63}
+    Onegin oneg = {};
+    oneg.file_name = "text.txt";
 
-    fread (text, sizeof (char), t_height * t_length, file);
+    FileReader (&oneg);
+    printf("reader execution is successful\n");
+    LineSeparator (&oneg);
+    printf("separator execution is successful\n");
+    Sorter (&oneg);
+    printf("sorter execution is successful\n");
+    FileOutput (&oneg);
+    printf("writer execution is successful\n");
 
-    StringSorter (t_height, t_length, text, index);
-
-    Output(text, index);
+    free (oneg.buffer);
+    free (oneg.line->lines_ptr);
+    free (&oneg.line->line_len);
 }
 
 //--------------------------- Other functions --------------------------//
 
-FILE * FileOpener ()
-
-void BubbleSort (int t_height, int t_length, string text[t_height], int index[t_height])
+void FileReader (struct Onegin * oneg)
 {
-    int BubbleSortCriteria = REPEAT;
-    char x = '\0';
-    char y = '\0';
+    assert (oneg != NULL);
 
-    while (BubbleSortCriteria != RIGHT)
+    oneg->file_onegin = fopen (oneg->file_name, "rb");                                             // source file opening
+    assert (oneg->file_onegin != NULL);
+
+    oneg->file_size = GimmeFileSize (oneg);
+
+    oneg->buffer = (char *) calloc ((oneg->file_size + 1), sizeof(char));                          // reading the content
+    assert (oneg->buffer != NULL);                                                                 // to buffer
+
+    size_t ReadStatus = fread (oneg->buffer, sizeof(char), oneg->file_size, oneg->file_onegin);
+    if (ReadStatus != oneg->file_size)
+        printf ("wrong reading\n");
+
+    oneg->lines_amount = 1;
+    *(oneg->buffer + oneg->file_size + 1) = '\0';
+
+    fclose (oneg->file_onegin);
+}
+
+//----------------------------------------------------------------------//
+
+void LineSeparator (struct Onegin * oneg)
+{
+    assert (oneg != NULL);
+
+    oneg->lines_amount = BufferLinesCounter (oneg);                                                // counts the amount of lines in the buffer
+    printf ("%d", oneg->lines_amount);
+
+    oneg->line = (Line*) calloc (oneg->lines_amount, sizeof(Line));
+    assert (oneg->line != NULL);                                                                   // line counter (local)
+    int prev_i_value = -1;
+    int len = 0;
+
+    for (int i = 0; i != oneg->file_size + 1; i++)
     {
-
-        BubbleSortCriteria = RIGHT;
-
-        for (int i = 0; i <= t_height + 1; i++)
+        if (*(oneg->buffer + i) == '\n')
         {
-            for (int j = 0; j <= t_length + 1; j++)
-            {
-                x = text[index[i]][j];
-                y = text[index[i+1]][j];
+            oneg->line[i].line_len = i - prev_i_value - 2;                                         // entering line length in len data buffer (without \0 at the end)
+            oneg->line[i].lines_ptr = oneg->buffer + i - oneg->line[i].line_len - 1;               // entering line pointer in ptr data buffer
 
-                int CCV = CharComparator (x, y);
-
-                if (CCV == LESSER)
-                {
-                    int temp_sloth = index[i];
-                    index[i] = index[i+1];
-                    index[i+1] = temp_sloth;
-                    BubbleSortCriteria = REPEAT;
-                    break;
-                }
-                else if (CCV == EQUAL)
-                    continue;
-                else
-                    break;
-            }
+            prev_i_value = i;
         }
     }
 }
 
 //----------------------------------------------------------------------//
 
-int CharComparator (char x, char y)
+void Sorter (struct Onegin * oneg)
 {
-    if (x > y)
-        return BIGGER;
-    else if (x < y)
-        return LESSER;
-    else
-        return EQUAL;
+    assert (oneg != NULL);
+
+    char * a = NULL;
+    char * b = NULL;
+
+    int len_a = 0;
+    int len_b = 0;
+
+    for (int i = 0; i < oneg->lines_amount; i++)
+    {
+        for (int j = 1; j < oneg->line->line_len - i; j++)
+        {
+            if (Comparator(i, j, oneg) == 1)
+                Swapper(oneg, i, j);
+        }
+    }
+}
+
+//----------------------------------------------------------------------//
+
+int Comparator (int i, int j, struct Onegin * oneg)
+{
+    int k = 0;
+    char ch_a = *(oneg->line[i].lines_ptr);
+    char ch_b = *(oneg->line[j].lines_ptr);
+
+    while (ch_a != '\n' || ch_b)
+    {
+        ch_a = *(oneg->line[i].lines_ptr + k);
+        ch_b = *(oneg->line[j].lines_ptr + k);
+        if (ch_a > ch_b)
+            return 1;
+        if (ch_b > ch_a)
+            return -1;
+    }
 
     return 0;
 }
 
 //----------------------------------------------------------------------//
 
-void Output (string text[t_height], int index[t_height])
+void Swapper (struct Onegin * oneg, int i, int j)
 {
-    for (unsigned int i = 0; i <= sizeof(index) + 1; i++)
-        printf ("%d %s\n", i + 1, text[index[sizeof(index) + 1 - i]]);
+    char temp = *(oneg->line->lines_ptr + i);
+    *(oneg->line->lines_ptr + i) = *(oneg->line->lines_ptr + j);
+    *(oneg->line->lines_ptr + j) = temp;
 }
+
+//----------------------------------------------------------------------//
+
+void FileOutput (struct Onegin * oneg)
+{
+    assert (oneg != NULL);
+
+    for (size_t i = 0; i <= oneg->lines_amount; i++)
+    {
+        for (int j = 0; j <= oneg->line->line_len; i++)
+        {
+            char output = *(oneg->line->lines_ptr + oneg->line->line_len + j);
+            printf ("%c", output);
+        }
+    }
+}
+
+//----------------------------------------------------------------------//
+
+/*void FileWriter (struct Onegin * oneg)
+{
+    assert (oneg != NULL);
+
+    char * buffer_sorted = (char *) calloc (oneg.file_size + 1, sizeof(char));
+
+    for (int i = 0; i < oneg.file_size + 1, i++)
+    {
+
+    }
+
+    output_file = fopen ("output.txt", "r");
+    size_t ReadStatus = fwrite (buffer_sorted, sizeof(char), oneg.file_size, output_file);
+    assert (ReadStatus != oneg.file_size);
+
+    fclose (oneg.FILE_NAME);
+    free (buffer_sorted);
+}*/
+
+//----------------------------------------------------------------------//
+
+size_t GimmeFileSize (struct Onegin * oneg)
+{
+    struct stat st = {};
+    fstat (fileno(oneg->file_onegin), &st);
+    assert (oneg->file_size != 0);
+
+    return st.st_size;
+}
+
+//----------------------------------------------------------------------//
+
+size_t BufferLinesCounter (struct Onegin * oneg)
+{
+    size_t lines = 0;
+
+    for (size_t i = 0; i != oneg->file_size + 1; i++)
+    {
+        if (*(oneg->buffer + i) == '\r')
+        {
+            *(oneg->buffer + i) = '\0';
+            lines++;
+        }
+    }
+
+    return lines;
+}
+
+//----------------------------------------------------------------------//
