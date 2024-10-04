@@ -15,15 +15,15 @@
 void FileReader (struct Onegin * oneg);
 void LineSeparator (struct Onegin * oneg);
 void Sorter (struct Onegin * oneg);
-int Comparator (char * a, size_t len_a, char * b, size_t len_b);
+int Comparator (int i, int j, struct Onegin * oneg);
 void Swapper (struct Onegin * oneg, int i, int j);
 //void FileWriter (struct Onegin * oneg);
 void FileOutput (struct Onegin * oneg);
 
 //------------------------ Secondary Functions --------------------------//
 
-size_t GimmeFileSize (struct Onegin * oneg);
 size_t BufferLinesCounter (struct Onegin * oneg);
+void GimmeFileSize (struct Onegin * oneg);
 
 //----------------------- Constants and Structs -------------------------//
 
@@ -62,8 +62,7 @@ int main ()
     printf("writer execution is successful\n");
 
     free (oneg.buffer);
-    free (oneg.line->lines_ptr);
-    free (&oneg.line->line_len);
+    free (oneg.line);
 }
 
 //--------------------------- Other functions --------------------------//
@@ -75,17 +74,20 @@ void FileReader (struct Onegin * oneg)
     oneg->file_onegin = fopen (oneg->file_name, "rb");                                             // source file opening
     assert (oneg->file_onegin != NULL);
 
-    oneg->file_size = GimmeFileSize (oneg);
+    GimmeFileSize (oneg);
+    assert (oneg->file_size != 0);
+    printf ("%lu\n", oneg->file_size);
 
-    oneg->buffer = (char *) calloc ((oneg->file_size + 1), sizeof(char));                          // reading the content
-    assert (oneg->buffer != NULL);                                                                 // to buffer
+    oneg->buffer = (char *) calloc ((oneg->file_size + 1), sizeof(char));
+    printf ("%p\n", oneg->buffer);
+    assert (oneg->buffer != NULL);                                                                 
 
     size_t ReadStatus = fread (oneg->buffer, sizeof(char), oneg->file_size, oneg->file_onegin);
     if (ReadStatus != oneg->file_size)
         printf ("wrong reading\n");
 
     oneg->lines_amount = 1;
-    *(oneg->buffer + oneg->file_size + 1) = '\0';
+    *(oneg->buffer + oneg->file_size) = '\0';
 
     fclose (oneg->file_onegin);
 }
@@ -97,19 +99,21 @@ void LineSeparator (struct Onegin * oneg)
     assert (oneg != NULL);
 
     oneg->lines_amount = BufferLinesCounter (oneg);                                                // counts the amount of lines in the buffer
-    printf ("%d", oneg->lines_amount);
+    printf ("%lu\n", oneg->lines_amount);
+    printf ("yee\n");
 
-    oneg->line = (Line*) calloc (oneg->lines_amount, sizeof(Line));
+    oneg->line = (Line*) calloc ((oneg->lines_amount + 1), sizeof(Line));
     assert (oneg->line != NULL);                                                                   // line counter (local)
-    int prev_i_value = -1;
-    int len = 0;
+    int prev_i_value = 0;
 
-    for (int i = 0; i != oneg->file_size + 1; i++)
+    for (int i = 0; i != (int) oneg->file_size; i++)
     {
         if (*(oneg->buffer + i) == '\n')
         {
-            oneg->line[i].line_len = i - prev_i_value - 2;                                         // entering line length in len data buffer (without \0 at the end)
-            oneg->line[i].lines_ptr = oneg->buffer + i - oneg->line[i].line_len - 1;               // entering line pointer in ptr data buffer
+            oneg->line[i].line_len = i - prev_i_value - 1;
+            printf ("%d %p\n", oneg->line[i].line_len, &oneg->line[i].line_len);
+            oneg->line[i].lines_ptr = oneg->buffer + i - oneg->line[i].line_len - 1;
+            printf ("%p\n i = %d\n", oneg->line[i].lines_ptr, i);
 
             prev_i_value = i;
         }
@@ -122,13 +126,8 @@ void Sorter (struct Onegin * oneg)
 {
     assert (oneg != NULL);
 
-    char * a = NULL;
-    char * b = NULL;
 
-    int len_a = 0;
-    int len_b = 0;
-
-    for (int i = 0; i < oneg->lines_amount; i++)
+    for (int i = 0; i < (int) oneg->lines_amount; i++)
     {
         for (int j = 1; j < oneg->line->line_len - i; j++)
         {
@@ -163,9 +162,9 @@ int Comparator (int i, int j, struct Onegin * oneg)
 
 void Swapper (struct Onegin * oneg, int i, int j)
 {
-    char temp = *(oneg->line->lines_ptr + i);
-    *(oneg->line->lines_ptr + i) = *(oneg->line->lines_ptr + j);
-    *(oneg->line->lines_ptr + j) = temp;
+    char * temp = oneg->line[j].lines_ptr;
+    oneg->line[j].lines_ptr = oneg->line[i].lines_ptr;
+    oneg->line[i].lines_ptr = temp;
 }
 
 //----------------------------------------------------------------------//
@@ -176,11 +175,12 @@ void FileOutput (struct Onegin * oneg)
 
     for (size_t i = 0; i <= oneg->lines_amount; i++)
     {
-        for (int j = 0; j <= oneg->line->line_len; i++)
+        for (int j = 0; j <= oneg->line[i].line_len; i++)
         {
-            char output = *(oneg->line->lines_ptr + oneg->line->line_len + j);
+            char output = *(&oneg->line->lines_ptr[i] + j);
             printf ("%c", output);
         }
+        printf("\n");
     }
 }
 
@@ -207,13 +207,11 @@ void FileOutput (struct Onegin * oneg)
 
 //----------------------------------------------------------------------//
 
-size_t GimmeFileSize (struct Onegin * oneg)
+void GimmeFileSize (struct Onegin * oneg)
 {
     struct stat st = {};
     fstat (fileno(oneg->file_onegin), &st);
-    assert (oneg->file_size != 0);
-
-    return st.st_size;
+    oneg->file_size = (size_t) st.st_size;
 }
 
 //----------------------------------------------------------------------//
@@ -227,11 +225,12 @@ size_t BufferLinesCounter (struct Onegin * oneg)
         if (*(oneg->buffer + i) == '\r')
         {
             *(oneg->buffer + i) = '\0';
-            lines++;
         }
+        if (*(oneg->buffer + i) == '\n')
+            lines++;
     }
 
-    return lines;
+    return lines + 1;
 }
 
 //----------------------------------------------------------------------//
