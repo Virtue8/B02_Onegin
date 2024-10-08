@@ -23,7 +23,7 @@ void FileOutput (struct Onegin * oneg);
 
 //------------------------ Secondary Functions --------------------------//
 
-size_t BufferLinesCounter (struct Onegin * oneg);
+size_t BufferLinesRefactorer (struct Onegin * oneg);
 void GimmeFileSize (struct Onegin * oneg);
 
 //----------------------- Constants and Structs -------------------------//
@@ -54,19 +54,15 @@ int main ()
     oneg.file_name = "text.txt";
 
     FileReader (&oneg);
-    printf("reader execution is successful\n");
     LineSeparator (&oneg);
-    printf("separator execution is successful\n");
     FileOutput (&oneg);
-    printf("writer execution is successful (normal)\n");    
+    printf("\nNormal Text\n\n");    
     Sorter (&oneg);
-    printf("sorter execution is successful\n");
     FileOutput (&oneg);
-    printf("writer execution is successful (sorted)\n");
-    ReversedSorter (&oneg);
-    printf ("reversed sorter execution is successful\n");
-    FileOutput (&oneg);
-    printf("writer execution is successful (reverse sorted)\n");
+    printf("\nNormal Sorted Text\n\n");
+    //ReversedSorter (&oneg);
+    //FileOutput (&oneg);
+    //printf("Reverse Sorted Text\n");
 
     free (oneg.buffer);
     free (oneg.line);
@@ -102,26 +98,25 @@ void LineSeparator (struct Onegin * oneg)
 {
     assert (oneg != NULL);
 
-    oneg->lines_amount = BufferLinesCounter (oneg);                                                // counts the amount of lines in the buffer
-    printf ("%lu\n", oneg->lines_amount);
+    oneg->lines_amount = BufferLinesRefactorer (oneg);                                             // counts the amount of lines in the buffer
 
     oneg->line = (Line*) calloc (oneg->lines_amount, sizeof(Line));
     assert (oneg->line != NULL);                                                                   // line counter (local)
     size_t prev_i_value = 0;
+    int k = 0;
 
-    for (size_t i = 0; i != oneg->file_size; i++)
+    for (size_t i = 0; i < oneg->file_size+1; i++)
     {
-        if (*(oneg->buffer + i) == '\0')
+        if (oneg->buffer[i] == '\0')
         {
-            oneg->line[i].line_len = i - prev_i_value;
-            printf ("%ld %p\n", oneg->line[i].line_len, &oneg->line[i].line_len);
-            oneg->line[i].lines_ptr = oneg->buffer + i - oneg->line[i].line_len;
-            printf ("%p\n i = %ld\n", oneg->line[i].lines_ptr, i);
-
-
+            oneg->line[k].line_len = i - prev_i_value;
+            oneg->line[k].lines_ptr = oneg->buffer + i - oneg->line[k].line_len;
             prev_i_value = i;
+            assert (oneg->line[k].lines_ptr);
+            k += 1;
         }
     }
+    assert (oneg->line[0].lines_ptr);
 }
 
 //----------------------------------------------------------------------//
@@ -129,10 +124,9 @@ void LineSeparator (struct Onegin * oneg)
 void Sorter (struct Onegin * oneg)
 {
     assert (oneg != NULL);
-    
     for (size_t i = 0; i < oneg->lines_amount; i++)
     {
-        for (size_t j = 1; j < oneg->line->line_len - i; j++)
+        for (size_t j = i + 1; j < oneg->lines_amount; j++)
         {
             if (Comparator(i, j, oneg) == 1)
                 Swapper(oneg, i, j);
@@ -145,12 +139,13 @@ void Sorter (struct Onegin * oneg)
 void ReversedSorter (struct Onegin * oneg)
 {
     assert (oneg != NULL);
-    
-    for (int i = 0; i < (int) oneg->lines_amount; i++)
+    for (size_t i = 0; i < oneg->lines_amount; i++)
     {
-        for (size_t j = 1; j < oneg->line->line_len - i; j++)
+        for (size_t j = i + 1; j < oneg->lines_amount; j++)
         {
-            if (Comparator(i, j, oneg) == 1)
+            int c = Comparator(i, j, oneg);
+            printf ("\n%d\n", c);
+            if (c == -1)
                 Swapper(oneg, i, j);
         }
     }
@@ -161,10 +156,10 @@ void ReversedSorter (struct Onegin * oneg)
 int Comparator (size_t i, size_t j, struct Onegin * oneg)
 {
     int k = 0;
-    char ch_a = *(oneg->line[i].lines_ptr);
-    char ch_b = *(oneg->line[j].lines_ptr);
+    char ch_a = *(oneg->line[i].lines_ptr + 1);
+    char ch_b = *(oneg->line[j].lines_ptr + 1);
 
-    while (ch_a != '\n' || ch_b)
+    while (ch_a != '\0' && ch_b != '\0')
     {
         ch_a = *(oneg->line[i].lines_ptr + k);
         ch_b = *(oneg->line[j].lines_ptr + k);
@@ -172,6 +167,8 @@ int Comparator (size_t i, size_t j, struct Onegin * oneg)
             return 1;
         if (ch_b > ch_a)
             return -1;
+        else
+            k += 1;
     }
 
     return 0;
@@ -181,9 +178,9 @@ int Comparator (size_t i, size_t j, struct Onegin * oneg)
 
 void Swapper (struct Onegin * oneg, size_t i, size_t j)
 {
-    char * temp = oneg->line[j].lines_ptr;
-    oneg->line[j].lines_ptr = oneg->line[i].lines_ptr;
-    oneg->line[i].lines_ptr = temp;
+    struct Line temp = oneg->line[j];
+    oneg->line[j] = oneg->line[i];
+    oneg->line[i] = temp;
 }
 
 //----------------------------------------------------------------------//
@@ -191,10 +188,12 @@ void Swapper (struct Onegin * oneg, size_t i, size_t j)
 void FileOutput (struct Onegin * oneg)
 {
     assert (oneg != NULL);
-    printf("cfkoemkcds;a");
     for (size_t i = 0; i < oneg->lines_amount; i++)
     {
-        printf("%s\n", oneg->line[i].lines_ptr);
+        assert (oneg->line[i].lines_ptr);
+        for (size_t j = 0; j < oneg->line[i].line_len; j++)
+            printf ("%c", *(oneg->line[i].lines_ptr + j));
+        printf ("\n");
     }
 }
 
@@ -230,7 +229,7 @@ void GimmeFileSize (struct Onegin * oneg)
 
 //----------------------------------------------------------------------//
 
-size_t BufferLinesCounter (struct Onegin * oneg)
+size_t BufferLinesRefactorer (struct Onegin * oneg)
 {
     size_t lines = 0;
 
