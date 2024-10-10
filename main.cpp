@@ -14,17 +14,19 @@
 
 void FileReader (struct Onegin * oneg);
 void LineSeparator (struct Onegin * oneg);
-void Sorter (struct Onegin * oneg, int mode);
+void FileOutput (struct Onegin * oneg);
+
+void Sorter (struct Onegin * oneg, int (*f)(size_t, size_t, struct Onegin *));
 int Comparator (size_t i, size_t j, struct Onegin * oneg);
 int RevComparator (size_t i, size_t j, struct Onegin * oneg);
 void Swapper (struct Onegin * oneg, size_t i, size_t j);
-void IgnorePunctuationRule (char ch_a, char ch_b);
-void FileOutput (struct Onegin * oneg);
 
 //------------------------ Secondary Functions --------------------------//
 
+void IgnorePunctuationRule (char ch_a, char ch_b);
 size_t BufferLinesRefactorer (struct Onegin * oneg);
 void GimmeFileSize (struct Onegin * oneg);
+void NormalFileOutput (struct Onegin * oneg);
 
 //----------------------- Constants and Structs -------------------------//
 
@@ -61,14 +63,14 @@ int main ()
 
     FileReader (&oneg);
     LineSeparator (&oneg);
-    FileOutput (&oneg);
-    printf("\nNormal Text\n\n");    
-    Sorter (&oneg, NORMAL);
+    Sorter (&oneg, Comparator);
     FileOutput (&oneg);
     printf("\nNormal Sorted Text\n\n");
-    Sorter (&oneg, REVERSED);
+    Sorter (&oneg, RevComparator);
     FileOutput (&oneg);
-    printf("Reverse Sorted Text\n");
+    printf("Reverse Sorted Text\n\n");
+    NormalFileOutput (&oneg);
+    printf("\nOriginal Text\n\n");
 
     free (oneg.buffer);
     free (oneg.line);
@@ -127,23 +129,15 @@ void LineSeparator (struct Onegin * oneg)
 
 //----------------------------------------------------------------------//
 
-void Sorter (struct Onegin * oneg, int mode)
+void Sorter (struct Onegin * oneg, int (*f)(size_t, size_t, struct Onegin *))
 {
     assert (oneg != NULL);
     for (size_t i = 0; i < oneg->lines_amount; i++)
     {
         for (size_t j = i + 1; j < oneg->lines_amount; j++)
         {
-            if (mode == NORMAL)
-            {
-                if (Comparator(i, j, oneg) == 1)
-                    Swapper(oneg, i, j);
-            }
-            else if (mode == REVERSED)
-            {
-                if (RevComparator(i, j, oneg) == 1)
-                    Swapper(oneg, i, j);
-            }
+            if ((*f)(i, j, oneg) == 1)
+                Swapper(oneg, i, j);
         }
     }
 }
@@ -235,6 +229,20 @@ void FileOutput (struct Onegin * oneg)
 
 //----------------------------------------------------------------------//
 
+void NormalFileOutput (struct Onegin * oneg)
+{
+    assert (oneg != NULL);
+    for (size_t i = 0; i < oneg->file_size; i++)
+    {
+        if (oneg->buffer[i] != '\0')
+            printf ("%c", oneg->buffer[i]);
+        else
+            printf ("\n");
+    }
+}
+
+//----------------------------------------------------------------------//
+
 void GimmeFileSize (struct Onegin * oneg)
 {
     struct stat st = {};
@@ -270,3 +278,5 @@ void IgnorePunctuationRule (char ch_a, char ch_b)
     if (ch_b == '!' || ch_b == ',' || ch_b == '.' || ch_b == ':' || ch_b == ';' || ch_b == ' ')
         ch_b = *(&ch_b - 1);
 }
+
+//----------------------------------------------------------------------//
