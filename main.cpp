@@ -23,7 +23,7 @@ void Swapper (struct Onegin * oneg, size_t i, size_t j);
 
 //------------------------ Secondary Functions --------------------------//
 
-void IgnorePunctuationRule (char ch_a, char ch_b);
+char * IgnorePunctuationRule (char * c);
 size_t BufferLinesRefactorer (struct Onegin * oneg);
 void GimmeFileSize (struct Onegin * oneg);
 void NormalFileOutput (struct Onegin * oneg);
@@ -177,24 +177,21 @@ int Comparator (size_t i, size_t j, struct Onegin * oneg)
 
 int RevComparator (size_t i, size_t j, struct Onegin * oneg)
 {
-    int k = 1;
-    char ch_a = *(oneg->line[i].lines_ptr + oneg->line[i].line_len - k);
-    char ch_b = *(oneg->line[j].lines_ptr + oneg->line[j].line_len - k);
+    int k = 0;
+    char * ch_a = oneg->line[i].lines_ptr + oneg->line[i].line_len - 1;
+    char * ch_b = oneg->line[j].lines_ptr + oneg->line[j].line_len - 1;
 
-    while (ch_a != '\0' && ch_b != '\0')
+    while (*ch_a != '\0' && *ch_b != '\0')
     {
-        ch_a = *(oneg->line[i].lines_ptr + oneg->line[i].line_len - k);
-        ch_b = *(oneg->line[j].lines_ptr + oneg->line[j].line_len - k);
+        ch_a = IgnorePunctuationRule (ch_a);
+        ch_b = IgnorePunctuationRule (ch_b);
 
-        if (ch_a == '!' || ch_a == ',' || ch_a == '.' || ch_a == ':' || ch_a == ';' || ch_a == ' ')
-            ch_a = *(oneg->line[i].lines_ptr + oneg->line[i].line_len - k - 1);
+        ch_a -= k;
+        ch_b -= k;
 
-        if (ch_b == '!' || ch_b == ',' || ch_b == '.' || ch_b == ':' || ch_b == ';' || ch_b == ' ')
-            ch_b = *(oneg->line[j].lines_ptr + oneg->line[j].line_len - k - 1);
-
-        if (ch_a > ch_b)
+        if (*ch_a > *ch_b)
             return 1;
-        if (ch_b > ch_a)
+        if (*ch_b > *ch_a)
             return -1;
         else
             k += 1;
@@ -270,13 +267,11 @@ size_t BufferLinesRefactorer (struct Onegin * oneg)
 
 //----------------------------------------------------------------------//
 
-void IgnorePunctuationRule (char ch_a, char ch_b)
+char * IgnorePunctuationRule (char * c)
 {
-    if (ch_a == '!' || ch_a == ',' || ch_a == '.' || ch_a == ':' || ch_a == ';' || ch_a == ' ')
-        ch_a = *(&ch_a - 1);
-
-    if (ch_b == '!' || ch_b == ',' || ch_b == '.' || ch_b == ':' || ch_b == ';' || ch_b == ' ')
-        ch_b = *(&ch_b - 1);
+    if (!isalpha(*c))
+        c--;
+    return c;
 }
 
 //----------------------------------------------------------------------//
